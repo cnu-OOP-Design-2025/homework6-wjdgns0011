@@ -1,0 +1,60 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Test6
+      id: test6
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test6
+        setup-command: "/bin/bash test6.sh"
+        command: cat Test/output.txt
+        input: ''
+        expected-output: |-
+          Duck has borned
+          Quack!
+          Penguin has borned
+          Squawk!
+          Eagle has borned
+          Screech!
+          ----------------------
+          Bird #1:
+          Species: Duck
+          This bird can fly.
+          This bird can swim.
+          ----------------------
+          Bird #2:
+          Species: Penguin
+          This bird can't fly.
+          This bird can swim.
+          ----------------------
+          Bird #3:
+          Species: Eagle
+          This bird can fly.
+          This bird can't swim.
+          ----------------------
+          Quack!
+          Duck has died
+          Squawk!
+          Penguin has died
+          Screech!
+          Eagle has died
+        comparison-method: contains
+        timeout: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST6_RESULTS: "${{steps.test6.outputs.result}}"
+      with:
+        runners: test6
